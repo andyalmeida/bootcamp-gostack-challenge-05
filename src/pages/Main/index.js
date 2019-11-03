@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { FaGithubAlt, FaPlus, FaSpinner } from 'react-icons/fa';
 
 import api from '../../services/api';
-import { Container, Form, SubmitButton, List } from './styles';
+import { Container } from '../../components/Container';
+import { Form, SubmitButton, List } from './styles';
 
 export default class Main extends Component {
   state = {
@@ -56,12 +58,12 @@ export default class Main extends Component {
     return (
       <Container>
         <h1>
-          <FaGithubAlt /> Repositórios
+          <FaGithubAlt /> Repositories
         </h1>
         <Form onSubmit={this.handleSubmit}>
           <input
             type="text"
-            placeholder="Adicionar repositório"
+            placeholder="Add repository"
             value={newRepo}
             onChange={this.handleInputChange}
           />
@@ -77,7 +79,10 @@ export default class Main extends Component {
         <List>
           {repositories.map(respository => (
             <li key={respository.name}>
-              {respository.name} <a>DETALHES</a>
+              {respository.name}{' '}
+              <Link to={`/repository/${encodeURIComponent(respository.name)}`}>
+                DETAILS
+              </Link>
             </li>
           ))}
         </List>
