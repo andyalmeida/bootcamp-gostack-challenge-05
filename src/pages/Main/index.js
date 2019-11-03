@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { FaGithubAlt, FaPlus, FaSpinner } from 'react-icons/fa';
+import { FaGithubAlt, FaPlus, FaSpinner, FaEye, FaTimes } from 'react-icons/fa';
 
 import api from '../../services/api';
 import { Container } from '../../components/Container';
@@ -72,6 +72,14 @@ export default class Main extends Component {
     }
   };
 
+  handleDelete = repository => {
+    const { repositories } = this.state;
+
+    this.setState({
+      repositories: repositories.filter(rep => rep.name !== repository),
+    });
+  };
+
   render() {
     const { newRepo, repositories, loading, error, errorMessage } = this.state;
 
@@ -87,7 +95,7 @@ export default class Main extends Component {
             value={newRepo}
             onChange={this.handleInputChange}
           />
-          <SubmitButton loading={loading}>
+          <SubmitButton loading={loading ? 1 : 0}>
             {loading ? (
               <FaSpinner color="#FFF" size={14} />
             ) : (
@@ -101,9 +109,14 @@ export default class Main extends Component {
           {repositories.map(respository => (
             <li key={respository.name}>
               {respository.name}{' '}
-              <Link to={`/repository/${encodeURIComponent(respository.name)}`}>
-                DETAILS
-              </Link>
+              <div>
+                <Link
+                  to={`/repository/${encodeURIComponent(respository.name)}`}
+                >
+                  <FaEye />
+                </Link>
+                <FaTimes onClick={() => this.handleDelete(respository.name)} />
+              </div>
             </li>
           ))}
         </List>

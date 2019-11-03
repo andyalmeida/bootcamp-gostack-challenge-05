@@ -127,13 +127,20 @@ export const Pagination = styled.div`
   justify-content: space-around;
 
   button {
+    display: flex;
+    align-items: center;
     background-color: #fff;
     border: 0;
-    font-size: 25px;
+    font-size: 16px;
     color: #7159c1;
+    font-weight: bold;
 
     &:disabled {
       color: #dbd3f5;
+    }
+
+    svg {
+      margin: 0 5px;
     }
   }
 `;

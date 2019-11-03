@@ -75,8 +75,13 @@ export const List = styled.ul`
     }
 
     a {
-      color: #7159c1;
       text-decoration: none;
+    }
+
+    svg {
+      color: #7159c1;
+      margin-left: 5px;
+      cursor: pointer;
     }
   }
 `;

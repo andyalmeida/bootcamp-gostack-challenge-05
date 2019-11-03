@@ -165,14 +165,14 @@ export default class Repository extends Component {
             disabled={!pages.prev}
             onClick={() => this.handlePagination(pages.prev)}
           >
-            <FaAngleDoubleLeft />
+            <FaAngleDoubleLeft size={20} /> Prev
           </button>
           <button
             type="button"
             disabled={!pages.next}
             onClick={() => this.handlePagination(pages.next)}
           >
-            <FaAngleDoubleRight />
+            Next <FaAngleDoubleRight size={20} />
           </button>
         </Pagination>
       </Container>
