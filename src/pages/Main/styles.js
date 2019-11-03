@@ -11,6 +11,7 @@ export const Form = styled.form`
     padding: 10px 15px;
     border-radius: 4px;
     font-size: 16px;
+    border-color: ${props => props.error && '#ff9494'};
   }
 `;
 
@@ -22,6 +23,13 @@ const rotate = keyframes`
   to {
     transform: rotate(360deg);
   }
+`;
+
+export const ErrorMessage = styled.div`
+  color: #ff8888;
+  padding: 4px 13px;
+  font-size: 12px;
+  font-weight: 600;
 `;
 
 export const SubmitButton = styled.button.attrs(props => ({

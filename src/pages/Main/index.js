@@ -4,13 +4,15 @@ import { FaGithubAlt, FaPlus, FaSpinner } from 'react-icons/fa';
 
 import api from '../../services/api';
 import { Container } from '../../components/Container';
-import { Form, SubmitButton, List } from './styles';
+import { Form, SubmitButton, ErrorMessage, List } from './styles';
 
 export default class Main extends Component {
   state = {
     newRepo: '',
     repositories: [],
     loading: false,
+    error: false,
+    errorMessage: '',
   };
 
   componentDidMount() {
@@ -34,33 +36,51 @@ export default class Main extends Component {
   };
 
   handleSubmit = async e => {
-    e.preventDefault();
-    const { newRepo, repositories } = this.state;
+    try {
+      e.preventDefault();
+      const { newRepo, repositories } = this.state;
 
-    this.setState({ loading: true });
+      if (!newRepo) throw new Error('You need enter a repository name.');
 
-    const response = await api.get(`/repos/${newRepo}`);
+      const repoExist = repositories.find(repo => repo.name === newRepo);
+      if (repoExist) throw new Error('Repository already added.');
 
-    const data = {
-      name: response.data.full_name,
-    };
+      this.setState({ loading: true });
 
-    this.setState({
-      repositories: [...repositories, data],
-      newRepo: '',
-      loading: false,
-    });
+      const response = await api.get(`/repos/${newRepo}`).catch(error => {
+        if (error.response.status === 404)
+          throw new Error('Repository not found.');
+      });
+
+      const data = {
+        name: response.data.full_name,
+      };
+
+      this.setState({
+        repositories: [...repositories, data],
+        newRepo: '',
+        loading: false,
+        error: false,
+        errorMessage: '',
+      });
+    } catch (error) {
+      this.setState({
+        error: true,
+        errorMessage: error.message,
+        loading: false,
+      });
+    }
   };
 
   render() {
-    const { newRepo, repositories, loading } = this.state;
+    const { newRepo, repositories, loading, error, errorMessage } = this.state;
 
     return (
       <Container>
         <h1>
           <FaGithubAlt /> Repositories
         </h1>
-        <Form onSubmit={this.handleSubmit}>
+        <Form onSubmit={this.handleSubmit} error={error}>
           <input
             type="text"
             placeholder="Add repository"
@@ -75,6 +95,7 @@ export default class Main extends Component {
             )}
           </SubmitButton>
         </Form>
+        {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
 
         <List>
           {repositories.map(respository => (
