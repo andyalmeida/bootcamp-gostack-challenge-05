@@ -16,6 +16,7 @@ export default createGlobalStyle`
     background-color: #7159C1;
     text-rendering: optimizeLegibility !important;
     -webkit-font-smoothing: antialiased !important;
+    padding: 0 20px;
   }
 
   body, input, button {
