@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import api from '../../services/api';
 import { Container } from '../../components/Container';
-import { Loading, Owner, IssueList } from './styles';
+import { Loading, Owner, Filter, FilterButton, IssueList } from './styles';
 
 export default class Repository extends Component {
   static propTypes = {
@@ -19,17 +19,20 @@ export default class Repository extends Component {
     repository: {},
     issues: [],
     loading: true,
+    state: 'open',
   };
 
   async componentDidMount() {
     const { match } = this.props;
     const repoName = decodeURIComponent(match.params.repository);
 
+    const { state } = this.state;
+
     const [repository, issues] = await Promise.all([
       api.get(`/repos/${repoName}`),
       api.get(`/repos/${repoName}/issues`, {
         params: {
-          state: 'open',
+          state,
           per_page: 5,
         },
       }),
@@ -42,8 +45,32 @@ export default class Repository extends Component {
     });
   }
 
+  async componentDidUpdate(_, prevState) {
+    const { repository, state } = this.state;
+    if (prevState.state !== state) {
+      const issues = await api.get(`/repos/${repository.full_name}/issues`, {
+        params: {
+          state,
+          per_page: 5,
+        },
+      });
+
+      this.updateIssues(issues.data);
+    }
+  }
+
+  updateIssues(issues) {
+    this.setState({
+      issues,
+    });
+  }
+
+  handleStateChange(state) {
+    this.setState({ state });
+  }
+
   render() {
-    const { repository, issues, loading } = this.state;
+    const { repository, issues, loading, state } = this.state;
 
     if (loading) {
       return <Loading>Loading...</Loading>;
@@ -57,6 +84,26 @@ export default class Repository extends Component {
           <h1>{repository.name}</h1>
           <p>{repository.description}</p>
         </Owner>
+        <Filter>
+          <FilterButton
+            hilight={state === 'open'}
+            onClick={() => this.handleStateChange('open')}
+          >
+            Open
+          </FilterButton>
+          <FilterButton
+            hilight={state === 'closed'}
+            onClick={() => this.handleStateChange('closed')}
+          >
+            Closed
+          </FilterButton>
+          <FilterButton
+            hilight={state === 'all'}
+            onClick={() => this.handleStateChange('all')}
+          >
+            All
+          </FilterButton>
+        </Filter>
         <IssueList>
           {issues.map(issue => (
             <li key={String(issue.id)}>

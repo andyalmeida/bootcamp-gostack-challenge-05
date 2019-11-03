@@ -42,10 +42,28 @@ export const Owner = styled.div`
   }
 `;
 
-export const IssueList = styled.ul`
+export const Filter = styled.ul`
   margin-top: 30px;
   padding-top: 30px;
   border-top: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+`;
+
+export const FilterButton = styled.ul.attrs({ type: 'button' })`
+  text-align: center;
+  padding-bottom: 5px;
+  width: 100px;
+  background-color: #fff;
+  border: 0;
+  cursor: pointer;
+  border-bottom: ${props => props.hilight && '3px solid #7159c1'};
+  font-weight: ${props => props.hilight && 'bold'};
+`;
+
+export const IssueList = styled.ul`
+  margin-top: 30px;
   list-style: none;
 
   li {
@@ -82,7 +100,7 @@ export const IssueList = styled.ul`
         }
 
         span {
-          background-color: #eee;
+          background-color: #dbd3f5;
           color: #333;
           border-radius: 2px;
           font-size: 12px;
