@@ -1,10 +1,18 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 
 import api from '../../services/api';
 import { Container } from '../../components/Container';
-import { Loading, Owner, Filter, FilterButton, IssueList } from './styles';
+import {
+  Loading,
+  Owner,
+  Filter,
+  FilterButton,
+  IssueList,
+  Pagination,
+} from './styles';
 
 export default class Repository extends Component {
   static propTypes = {
@@ -20,6 +28,7 @@ export default class Repository extends Component {
     issues: [],
     loading: true,
     state: 'open',
+    pages: {},
   };
 
   async componentDidMount() {
@@ -38,6 +47,8 @@ export default class Repository extends Component {
       }),
     ]);
 
+    this.updatePages(issues.headers.link);
+
     this.setState({
       repository: repository.data,
       issues: issues.data,
@@ -46,22 +57,46 @@ export default class Repository extends Component {
   }
 
   async componentDidUpdate(_, prevState) {
-    const { repository, state } = this.state;
+    const { state } = this.state;
     if (prevState.state !== state) {
-      const issues = await api.get(`/repos/${repository.full_name}/issues`, {
-        params: {
-          state,
-          per_page: 5,
-        },
-      });
-
-      this.updateIssues(issues.data);
+      await this.updateIssues();
     }
   }
 
-  updateIssues(issues) {
+  async updateIssues(url) {
+    const { repository, state } = this.state;
+
+    const issues = await api.get(
+      url || `/repos/${repository.full_name}/issues`,
+      {
+        params: {
+          per_page: 5,
+          state,
+        },
+      }
+    );
+
+    this.updatePages(issues.headers.link);
     this.setState({
-      issues,
+      issues: issues.data,
+    });
+  }
+
+  updatePages(pagesString) {
+    const pages = {};
+
+    pagesString.split(',').forEach(page => {
+      const regexp = /<(.*)>; rel="(.*)"/g;
+      const matches = page.matchAll(regexp);
+      // eslint-disable-next-line no-restricted-syntax
+      for (const match of matches) {
+        Object.assign(pages, { [match[2]]: match[1] });
+        break;
+      }
+    });
+
+    this.setState({
+      pages,
     });
   }
 
@@ -69,8 +104,12 @@ export default class Repository extends Component {
     this.setState({ state });
   }
 
+  async handlePagination(url) {
+    await this.updateIssues(url);
+  }
+
   render() {
-    const { repository, issues, loading, state } = this.state;
+    const { repository, issues, loading, state, pages } = this.state;
 
     if (loading) {
       return <Loading>Loading...</Loading>;
@@ -120,6 +159,22 @@ export default class Repository extends Component {
             </li>
           ))}
         </IssueList>
+        <Pagination>
+          <button
+            type="button"
+            disabled={!pages.prev}
+            onClick={() => this.handlePagination(pages.prev)}
+          >
+            <FaAngleDoubleLeft />
+          </button>
+          <button
+            type="button"
+            disabled={!pages.next}
+            onClick={() => this.handlePagination(pages.next)}
+          >
+            <FaAngleDoubleRight />
+          </button>
+        </Pagination>
       </Container>
     );
   }

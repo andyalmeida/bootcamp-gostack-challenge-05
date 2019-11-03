@@ -119,3 +119,21 @@ export const IssueList = styled.ul`
     }
   }
 `;
+
+export const Pagination = styled.div`
+  margin-top: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  button {
+    background-color: #fff;
+    border: 0;
+    font-size: 25px;
+    color: #7159c1;
+
+    &:disabled {
+      color: #dbd3f5;
+    }
+  }
+`;
